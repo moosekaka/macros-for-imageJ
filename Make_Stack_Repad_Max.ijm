@@ -87,7 +87,7 @@ function zproj(imageID){
 }
 
 
- // Main
+// Main
 newImage("BFfocalPlane", "8-bit black", 512, 512, x);
 bffoc = getImageID(); bfcount=0;
 newImage("MAX RFP", "16-bit black", 512, 512, x);
@@ -116,7 +116,7 @@ maxgfp = getImageID(); gfpcount=0;
 		}
 	
 		numofPics=fileList.length;
-	
+		//Brightfield channel
 		if(nch1>0){
 		bfcount++;
 		run("Image Sequence...", "open=[" + dir + list[k] + fileList[nch1] + "] number=" + numofPics + " starting=1 increment=1 scale=100 file=BF sort");
@@ -127,7 +127,7 @@ maxgfp = getImageID(); gfpcount=0;
 		fdup = getFocal(img_src);
 		insertSlice(fdup, img_src, bfcount, bffoc);
 		}
-
+		//RFP channel
 		if(nch2>0){
 		rfpcount++;
 		run("Image Sequence...", "open=["+dir+list[k]+fileList[nch2]+"] number="+numofPics+" starting=1 increment=1 scale=100 file=RFP sort");
@@ -139,7 +139,7 @@ maxgfp = getImageID(); gfpcount=0;
 		maxedimg = getImageID();
 		insertSlice(1, maxedimg, rfpcount, maxrfp);
 		}
-		
+		//GFP channel
 		if(nch3>0){
 		gfpcount++;
 		run("Image Sequence...", "open=["+dir+list[k]+fileList[nch3]+"] number="+numofPics+" starting=1 increment=1 scale=100 file=GFP sort");
