@@ -3,12 +3,7 @@ run("Close All");
 print("this is just to make sure log is open");
 selectWindow("Log"); 
 run("Close"); 
-setBatchMode(true)
-dir = getDirectory("Choose a Directory ");
-list = getFileList(dir);
-x = list.length;
-print("number of folders: " + x);
-print("\n");
+setBatchMode(true);
 
 //get tag based on file Show info
 function getTag(tag) {
@@ -20,19 +15,6 @@ function getTag(tag) {
 	index2 = indexOf(info, ",", index1);
 	value = substring(info, index1+1, index2);
 	return value;
-}
-
-
-// copies slice from src image stack to dest image stack	
-function insertSlice(n_src, id_src, n_dest, id_dest ){
-	selectImage(id_src);
-	fname = getInfo("image.filename");
-	setSlice(n_src);
-	run("Copy");
-	selectImage(id_dest);
-	setSlice(n_dest);
-	run("Paste");
-	setMetadata("Label", fname );
 }
 
 
@@ -57,6 +39,7 @@ function getFocal(id){
 			}
 		}		
 		print ("Focal slice is on  slice " + frameToDup);
+		
 		return frameToDup;
 }
 
@@ -71,23 +54,48 @@ function repad_rename(strg){
 		index = split(_index[L], "_");
 		_ind=IJ.pad(index[1], 3);
 		_FileName = replace(_FileName[0], "(?<=_)[0-9]+", _ind) + ".tif";
-		print("repadded " + strg +" to "+ _FileName+ "\n");
+		//print("repadded " + strg +" to "+ _FileName+ "\n");
 		File.rename(strg, _FileName);
 	}
 }
 
+
 // make max proj
 function zproj(imageID){
 	selectImage(imageID);
+	fn = getInfo("image.filename");
+	print("make mx proj of "+fn);
 	run("Z Project...", "start=1 stop=500 projection=[Max Intensity]");
-	fname = getInfo("image.filename");
-	print(fname);
-	getImageID();
-	setMetadata("Label", "MAX" + fname );
+	setMetadata("Label", fn );
+	x = getImageID();
+	return x;
+}
+
+
+// copies slice from src image stack to dest image stack	
+function insertSlice(n_src, id_src, n_dest, id_dest ){
+	selectImage(id_src);
+	fname = getMetadata("Label");
+	setSlice(n_src);
+	run("Copy");
+	selectImage(id_dest);
+	setSlice(n_dest);
+	run("Paste");
+	setMetadata("Label", fname);
+	close(id_src);
 }
 
 
 // Main
+dir = getDirectory("Choose a Directory ");
+list = getFileList(dir);
+x = list.length;
+print("number of folders: " + x);
+print("\n");
+for (k=0;k<list.length;k++){
+	print(k + dir + list[k]);
+}
+
 newImage("BFfocalPlane", "8-bit black", 512, 512, x);
 bffoc = getImageID(); bfcount=0;
 newImage("MAX RFP", "16-bit black", 512, 512, x);
@@ -96,22 +104,21 @@ newImage("MAX GFP", "16-bit black", 512, 512, x);
 maxgfp = getImageID(); gfpcount=0;
 
 	for (k=0;k<list.length;k++){
-	nch1 = 0; nch2 = 0; nch3 = 0; nch4 = 0; nch5=0; 
 		if (File.isDirectory(dir+list[k])){
 		names=split(list[k],"/") ;
 		fileList=getFileList(dir+list[k]);
-		
-			for (n=0;n<fileList.length;n++){
+		nch1 = 0; nch2 = 0; nch3 = 0; nch4 = 0; nch5=0;
+			for (n=0; n<fileList.length; n++){
 			if 	(indexOf(fileList[n],"BF") > 0)
-				nch1=n;
+				nch1 = n;
 			else if (indexOf(fileList[n],"RFP") > 0) 
-				nch2=n;
+				nch2 = n;
 			else if (indexOf(fileList[n],"GFP") > 0)
-				nch3=n;			
+				nch3 = n;
 			else if (indexOf(fileList[n], "DAPI") > 0) 
-				nch4=n;
+				nch4 = n;
 			else if (indexOf(fileList[n], "Cy5") > 0)
-				nch5=n;
+				nch5 = n;
 			}
 		}
 	
@@ -124,33 +131,34 @@ maxgfp = getImageID(); gfpcount=0;
 		save(fpath);
 		repad_rename(fpath); print("\n");
 		img_src = getImageID();
+		label = getTitle;
 		fdup = getFocal(img_src);
 		insertSlice(fdup, img_src, bfcount, bffoc);
+		setMetadata("Label", label);
 		}
 		//RFP channel
 		if(nch2>0){
 		rfpcount++;
-		run("Image Sequence...", "open=["+dir+list[k]+fileList[nch2]+"] number="+numofPics+" starting=1 increment=1 scale=100 file=RFP sort");
+		run("Image Sequence...", "open=["+dir + list[k] + fileList[nch2] + "] number=" + numofPics + " starting=1 increment=1 scale=100 file=RFP sort");
 		fpath = dir + names[0] + "_RFPstack.tif" ;
 		save(fpath); 
 		repad_rename(fpath); print("\n");
 		img_src = getImageID();
-		zproj(img_src);
-		maxedimg = getImageID();
-		insertSlice(1, maxedimg, rfpcount, maxrfp);
+		zid = zproj(img_src);
+		insertSlice(1, zid, rfpcount, maxrfp);
 		}
 		//GFP channel
 		if(nch3>0){
 		gfpcount++;
-		run("Image Sequence...", "open=["+dir+list[k]+fileList[nch3]+"] number="+numofPics+" starting=1 increment=1 scale=100 file=GFP sort");
+		print(gfpcount);
+		run("Image Sequence...", "open=[" + dir + list[k] + fileList[nch3] + "] number="+numofPics + " starting=1 increment=1 scale=100 file=GFP sort");
 		fpath = dir + names[0] + "_GFPstack.tif" ;
 		save(fpath); 
 		repad_rename(fpath); print("\n");
 		img_src = getImageID();
-		zproj(img_src);
-		maxedimg = getImageID();
-		insertSlice(1, maxedimg, gfpcount, maxgfp);
-		}	
+		zid = zproj(img_src);
+		insertSlice(1, zid, gfpcount, maxgfp);
+		}
 	}
 	
 selectImage(bffoc);
