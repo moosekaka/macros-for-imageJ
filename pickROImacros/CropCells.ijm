@@ -12,7 +12,7 @@
 // MaxProjs.tiff files.
 
 // Defining the size of the singl cell images:
-_xy = 200;
+_xy = 250;
 
 _RootFolder = getDirectory("Choose a Directory");
 
@@ -27,14 +27,13 @@ run("ROI Manager...");
 roiManager("Reset");
 roiManager("Open",_RootFolder + "RoiSet.zip");
 
-open("MaxProjs.tif");
+open("Max_GFP.tif");
 MAXP = getImageID;
 print(MAXP);
 
 // For each ROI (cell)
 
 for (roi = 0; roi < roiManager("count"); roi++) {
-	//print(roi);
 	
 	roiManager("Select",roi);
 	_FileName = getInfo("slice.label");

@@ -30,7 +30,7 @@ if (ntiff== 0) {
 
 // Generating the max projection stack
 
-newImage("zMax", "16-bit black", 3*w, h, ntiff);
+newImage("zMax", "8-bit black", 3*w, h, ntiff);
 
 item = 0; im = 0;
 while (item < _List.length)  {
