@@ -1,4 +1,6 @@
-//Macro to save FP and BF  files into a stack
+/* Script to save individual image acquisitions from MicroManager
+ * into brightfield and RFP/GFP stacks before cell circling 
+ * for input into Mitograph */
 run("Close All");
 print("this is just to make sure log is open");
 selectWindow("Log");

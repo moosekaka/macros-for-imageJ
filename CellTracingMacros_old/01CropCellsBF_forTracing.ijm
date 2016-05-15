@@ -4,31 +4,25 @@ run("Close All");
 print("this is just to make sure log is open");
 selectWindow("Log"); 
 run("Close"); 
-
 _xy = 250;
-
 _RootFolder = getDirectory("Choose a Directory");
 
 // Creating a directory where the files are saved
 File.makeDirectory(_RootFolder + "cells");
-
 setBatchMode(true);
 // Prevent generation of 32bit images
 run("RandomJ Options", "  adopt progress");
 
 run("ROI Manager...");
 roiManager("Reset");
-roiManager("Open",_RootFolder + "RoiSet.zip");
+roiManager("Open",File.getParent(_RootFolder) + "/RoiSet.zip");
 
-open("MaxProjs.tif");
+open("zBFfocal.tif");
 MAXP = getImageID;
 print(MAXP);
 
 // For each ROI (cell)
-
 for (roi = 0; roi < roiManager("count"); roi++) {
-	//print(roi);
-	
 	roiManager("Select",roi);
 	_FileName = getInfo("slice.label");
 	_FileName = replace(_FileName,".tif","@");
@@ -63,16 +57,11 @@ for (roi = 0; roi < roiManager("count"); roi++) {
 		run("Add...", "value=" + min/256 + " slice");
 		run("Paste");
 	}
-	
 	run("Select None");
 	resetMinAndMax();
-
-	//save(_RootFolder + "cells/" + IJ.pad(roi,3) + ".tif");
 	save(_RootFolder + "cells/" + _FileName + "_" + IJ.pad(roi,3) + ".tif");
-
 	selectImage(CELL); close();
 	selectImage(ORIGINAL); close();
-
 }
 
 setBatchMode(false);
