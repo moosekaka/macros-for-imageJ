@@ -164,7 +164,7 @@ maxgfp = getImageID(); gfpcount=0;
 	}
 
 selectImage(bffoc);
-run("Save", "save=["+dir+"BF_Focal.tif]");
+run("Save", "save=["+dir+"zBFfocal.tif]");
 selectImage(maxrfp);
 run("Save", "save=["+dir+"Max_RFP.tif]");
 selectImage(maxgfp);
