@@ -113,9 +113,9 @@ maxgfp = getImageID(); gfpcount=0;
 			for (n=0; n<fileList.length; n++){
 			if 	(indexOf(fileList[n],"BF") > 0)
 				nch1 = n;
-			else if (indexOf(fileList[n],"rfp") > 0)
+			else if (indexOf(fileList[n],"RFP") > 0)
 				nch2 = n;
-			else if (indexOf(fileList[n],"gfp") > 0)
+			else if (indexOf(fileList[n],"GFP") > 0)
 				nch3 = n;
 			else if (indexOf(fileList[n], "DAPI") > 0)
 				nch4 = n;
@@ -141,7 +141,7 @@ maxgfp = getImageID(); gfpcount=0;
 		//RFP channel
 		if(nch2>0){
 		rfpcount++;
-		run("Image Sequence...", "open=["+dir + list[k] + fileList[nch2] + "] number=" + numofPics + " starting=1 increment=1 scale=100 file=rfp sort");
+		run("Image Sequence...", "open=["+dir + list[k] + fileList[nch2] + "] number=" + numofPics + " starting=1 increment=1 scale=100 file=RFP sort");
 		fpath = dir + names[0] + "_RFPstack.tif" ;
 		save(fpath);
 		repad_rename(fpath); print("\n");
@@ -153,7 +153,7 @@ maxgfp = getImageID(); gfpcount=0;
 		if(nch3>0){
 		gfpcount++;
 		print(gfpcount);
-		run("Image Sequence...", "open=[" + dir + list[k] + fileList[nch3] + "] number="+numofPics + " starting=1 increment=1 scale=100 file=gfp sort");
+		run("Image Sequence...", "open=[" + dir + list[k] + fileList[nch3] + "] number="+numofPics + " starting=1 increment=1 scale=100 file=GFP sort");
 		fpath = dir + names[0] + "_GFPstack.tif" ;
 		save(fpath);
 		repad_rename(fpath); print("\n");
