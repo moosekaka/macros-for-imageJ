@@ -25,9 +25,10 @@ run("RandomJ Options", "  adopt progress");
 
 run("ROI Manager...");
 roiManager("Reset");
-roiManager("Open",_RootFolder + "RoiSet.zip");
 
-open("Max_GFP.tif");
+roiManager("Open",File.getParent(_RootFolder) + "/RoiSet.zip");
+open(File.getParent(_RootFolder) + "/Max_GFP.tif");
+
 MAXP = getImageID;
 print(MAXP);
 
