@@ -1,8 +1,10 @@
-//Macro to save FP and BF  files into a stack
+/* Script to save individual image acquisitions from MicroManager
+ * into brightfield and RFP/GFP stacks before cell circling 
+ * for input into Mitograph */
 run("Close All");
 print("this is just to make sure log is open");
-selectWindow("Log"); 
-run("Close"); 
+selectWindow("Log");
+run("Close");
 setBatchMode(true);
 
 //get tag based on file Show info
@@ -23,7 +25,7 @@ function getFocal(id){
 	selectImage(id);
 	getDimensions(w, h, dummy, slices, dummy);
 	run("Set Measurements...", "area mean standard modal min limit display redirect=None decimal=3");
-			
+
 		//set initial stdev value to that of frame 1
 		frameToDup=1;
 		setSlice(1);
@@ -37,9 +39,9 @@ function getFocal(id){
 			minVal = stdev;
 			frameToDup = n;
 			}
-		}		
+		}
 		print ("Focal slice is on  slice " + frameToDup);
-		
+
 		return frameToDup;
 }
 
@@ -47,8 +49,8 @@ function getFocal(id){
 //repad filenames
 function repad_rename(strg){
 	_FileName = "";
-	if (matches(strg, ".*[BRGFP]stack.*")){		
-		_FileName = split(strg, "."); 
+	if (matches(strg, ".*[BFP]stack.*")){
+		_FileName = split(strg, ".");
 		_index = split(_FileName[0], "\\");
 		L = _index.length - 1;
 		index = split(_index[L], "_");
@@ -72,7 +74,7 @@ function zproj(imageID){
 }
 
 
-// copies slice from src image stack to dest image stack	
+// copies slice from src image stack to dest image stack
 function insertSlice(n_src, id_src, n_dest, id_dest ){
 	selectImage(id_src);
 	fname = getMetadata("Label");
@@ -111,17 +113,17 @@ maxgfp = getImageID(); gfpcount=0;
 			for (n=0; n<fileList.length; n++){
 			if 	(indexOf(fileList[n],"BF") > 0)
 				nch1 = n;
-			else if (indexOf(fileList[n],"RFP") > 0) 
+			else if (indexOf(fileList[n],"RFP") > 0)
 				nch2 = n;
 			else if (indexOf(fileList[n],"GFP") > 0)
 				nch3 = n;
-			else if (indexOf(fileList[n], "DAPI") > 0) 
+			else if (indexOf(fileList[n], "DAPI") > 0)
 				nch4 = n;
 			else if (indexOf(fileList[n], "Cy5") > 0)
 				nch5 = n;
 			}
 		}
-	
+
 		numofPics=fileList.length;
 		//Brightfield channel
 		if(nch1>0){
@@ -141,7 +143,7 @@ maxgfp = getImageID(); gfpcount=0;
 		rfpcount++;
 		run("Image Sequence...", "open=["+dir + list[k] + fileList[nch2] + "] number=" + numofPics + " starting=1 increment=1 scale=100 file=RFP sort");
 		fpath = dir + names[0] + "_RFPstack.tif" ;
-		save(fpath); 
+		save(fpath);
 		repad_rename(fpath); print("\n");
 		img_src = getImageID();
 		zid = zproj(img_src);
@@ -153,18 +155,18 @@ maxgfp = getImageID(); gfpcount=0;
 		print(gfpcount);
 		run("Image Sequence...", "open=[" + dir + list[k] + fileList[nch3] + "] number="+numofPics + " starting=1 increment=1 scale=100 file=GFP sort");
 		fpath = dir + names[0] + "_GFPstack.tif" ;
-		save(fpath); 
+		save(fpath);
 		repad_rename(fpath); print("\n");
 		img_src = getImageID();
 		zid = zproj(img_src);
 		insertSlice(1, zid, gfpcount, maxgfp);
 		}
 	}
-	
+
 selectImage(bffoc);
-run("Save", "save=["+dir+"BF_Focal.tif]"); 
+run("Save", "save=["+dir+"zBFfocal.tif]");
 selectImage(maxrfp);
-run("Save", "save=["+dir+"Max_RFP.tif]"); 
+run("Save", "save=["+dir+"Max_RFP.tif]");
 selectImage(maxgfp);
-run("Save", "save=["+dir+"Max_GFP.tif]"); 
+run("Save", "save=["+dir+"Max_GFP.tif]");
 print("All Done!");
